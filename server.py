@@ -70,7 +70,25 @@ class NotebookServer:
             response.raise_for_status()
             data = response.json()
             if len(data[3]) > 0:
-                return f"Wikipedia page: {data[3][0]}"
+                wiki_link = data[3][0]
+
+                tree = ET.parse(XML_FILE)
+                root = tree.getroot()
+                topic_element = None
+                for t in root.findall("topic"):
+                    if t.get("name") == topic:
+                        topic_element = t
+                        break
+
+                if topic_element is None:
+                    topic_element = ET.SubElement(root, "topic", name=topic)
+
+                note = ET.SubElement(topic_element, "note", name="Wikipedia Info")
+                ET.SubElement(note, "text").text = f"Wikipedia page: {wiki_link}"
+                ET.SubElement(note, "timestamp").text = time.strftime("%Y-%m-%d %H:%M:%S")
+                save_xml(tree)
+
+                return f"Wikipedia page added to topic '{topic}': {wiki_link}"
             return "No Wikipedia content found"
         except requests.exceptions.RequestException as e:
             return f"Wikipedia request failed: {e}"

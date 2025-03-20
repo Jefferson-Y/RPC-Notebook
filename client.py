@@ -1,29 +1,39 @@
 import xmlrpc.client
 import datetime
 
-server = xmlrpc.client.ServerProxy("http://localhost:8000")
+SERVER_URL = "http://localhost:8000"
 
+try:
+    server = xmlrpc.client.ServerProxy(SERVER_URL)
+except ConnectionRefusedError:
+    print("Error: Unable to connect to the server. Please check if the server is running.")
 
 def add_note():
-    topic = input("Enter topic: ")
-    note_name = input("Enter note title: ")
-    text = input("Enter note text: ")
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    response = server.add_note(topic, note_name, text, timestamp)
-    print(response)
-
+    try:
+        topic = input("Enter topic: ")
+        note_name = input("Enter note title: ")
+        text = input("Enter note text: ")
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        response = server.add_note(topic, note_name, text, timestamp)
+        print(response)
+    except ConnectionRefusedError:
+        print("Error: Server is not responding. Please restart the server and try again.")
 
 def get_notes():
-    topic = input("Enter topic to retrieve notes: ")
-    response = server.get_notes(topic)
-    print("Notes:\n", response)
-
+    try:
+        topic = input("Enter topic to retrieve notes: ")
+        response = server.get_notes(topic)
+        print("Notes:\n", response)
+    except ConnectionRefusedError:
+        print("Error: Server is not responding. Please restart the server and try again.")
 
 def search_wikipedia():
-    topic = input("Enter topic to search on Wikipedia: ")
-    response = server.search_wikipedia(topic)
-    print("Wikipedia result:\n", response)
-
+    try:
+        topic = input("Enter topic to search on Wikipedia: ")
+        response = server.search_wikipedia(topic)
+        print("Wikipedia result:\n", response)
+    except ConnectionRefusedError:
+        print("Error: Server is not responding. Please restart the server and try again.")
 
 def main():
     while True:
@@ -46,7 +56,6 @@ def main():
             break
         else:
             print("Invalid choice, please try again.")
-
 
 if __name__ == "__main__":
     main()
